@@ -1,20 +1,12 @@
+
+
 if (! exists("NEI")) {
     message("Reading data. Please wait a few seconds ...")
     NEI <<- readRDS("summarySCC_PM25.rds")
 }
 
-if (! exists("SCC"))
-    SCC <<- readRDS("Source_Classification_Code.rds")
-
-if (! exists("NEI.motor")) {
-                                        # determine SSC codes related to motor
-    motor.str <- "[mM][oO][tT][oO][rR]"
-    motor.idx <- grep(motor.str, SCC$Short.Name)
-    SCC.motor <- SCC$SCC[motor.idx]              # codes SCC related to motor
-
-                                        # select only SCC related to motor
-    NEI.motor <<- NEI[!is.na(match(NEI$SCC, SCC.motor)),]
-}
+if (! exists("NEI.motor"))
+    NEI.motor <<- NEI[NEI$type == "ON-ROAD",]
 
 if (! exists("total.emissions.motor.Baltimore")) {
     NEI.motor.Baltimore <- NEI.motor[NEI.motor$fips == "24510", ]

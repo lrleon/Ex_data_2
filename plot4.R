@@ -9,7 +9,8 @@ if (! exists("SCC"))
 if (! exists("NEI.coal")) {
                                         # determine SSC codes related to coal
     coal.str <- "[cC][oO][aA][lL]"
-    coal.idx <- grep(coal.str, SCC$Short.Name)
+    #coal.idx <- grep(coal.str, SCC$EI.Sector)
+    coal.idx <- grep(coal.str, SCC$Short.Name) 
     SCC.coal <- SCC$SCC[coal.idx]              # codes SCC related to coal
 
                                         # select only SCC related to coal
