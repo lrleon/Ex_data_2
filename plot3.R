@@ -1,14 +1,13 @@
 
 require(ggplot2)
 
-                                        # verifiy if the data is already loaded
-if (! exists("NEI")) {
+                                        
+if (! exists("NEI")) {    # verifiy if NEI data is already loaded
     message("Reading data. Please wait a few seconds ...")
     NEI <<- readRDS("summarySCC_PM25.rds")
 }
 
-                                # verify if Baltimore data is already computed
-if (! exists("NEI.Baltimore")) {
+if (! exists("NEI.Baltimore")) { # verify if Baltimore data is already computed
     message("Filtering the data for Baltimore city")
     NEI.Baltimore <<- NEI[NEI$fips == "24510", ]}
 

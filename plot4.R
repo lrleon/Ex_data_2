@@ -1,17 +1,15 @@
 require(ggplot2)
-                                        # verify if NEI data is already loaded
-if (! exists("NEI")) {
+                                        
+if (! exists("NEI")) {    # verify if NEI data is already loaded
     message("Reading data. Please wait a few seconds ...")
     NEI <<- readRDS("summarySCC_PM25.rds")
 }
-
-                                        # verify if SCC data is already loaded
-if (! exists("SCC"))
+                                        
+if (! exists("SCC"))    # verify if SCC data is already loaded
     SCC <<- readRDS("Source_Classification_Code.rds")
 
-                                        # verify if coal related is
-                                        # already computed
-if (! exists("NEI.coal")) {
+if (! exists("NEI.coal")) { # verify if coal related is already computed
+
                                         # determine SSC codes related to coal
     coal.str <- "[cC][oO][aA][lL]"      # the word "coal"
     coal.idx <- grep(coal.str, SCC$EI.Sector)

@@ -1,23 +1,23 @@
 require(ggplot2)
 require(gridExtra)
 
-if (! exists("NEI")) {
+if (! exists("NEI")) {    # verify if NEI data is already loaded
     message("Reading data. Please wait a few seconds ...")
     NEI <<- readRDS("summarySCC_PM25.rds")
 }
 
-if (! exists("SCC"))
+if (! exists("SCC"))    # verify is SCC data is already loaded
     SCC <<- readRDS("Source_Classification_Code.rds")
 
-if (! exists("NEI.on.road"))
+if (! exists("NEI.on.road"))    # NEI subset containg ON-ROAD types
     NEI.on.road <<- NEI[NEI$type == "ON-ROAD",]
+
+if (! exists("NEI.non.road"))    # NEI subset containg NON-ROAD types
+    NEI.non.road <<- NEI[NEI$type == "NON-ROAD",]
 
 if (! exists("NEI.on.road.Baltimore")) 
     NEI.on.road.Baltimore <<- merge(NEI.on.road[NEI.on.road$fips == "24510", ],
                                     SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
-
-if (! exists("NEI.non.road"))
-    NEI.non.road <<- NEI[NEI$type == "NON-ROAD",]
 
 if (! exists("NEI.non.road.Baltimore")) 
     NEI.non.road.Baltimore <<-

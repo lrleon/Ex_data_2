@@ -1,5 +1,5 @@
 
-if (! exists("NEI")) {
+if (! exists("NEI")) {    # verify if NEI data is already loaded
     message("Reading data. Please wait a few seconds ...")
     NEI <<- readRDS("summarySCC_PM25.rds")
 }
