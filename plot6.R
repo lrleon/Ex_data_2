@@ -1,49 +1,87 @@
-library(ggplot2)
+require(ggplot2)
+require(gridExtra)
 
 if (! exists("NEI")) {
     message("Reading data. Please wait a few seconds ...")
     NEI <<- readRDS("summarySCC_PM25.rds")
 }
 
-if (! exists("NEI.motor")) 
-    NEI.motor <<- NEI[NEI$type == "ON-ROAD",]
+if (! exists("SCC"))
+    SCC <<- readRDS("Source_Classification_Code.rds")
 
-if (! exists("total.emissions.motor.Baltimore")) {
-    NEI.motor.Baltimore <- NEI.motor[NEI.motor$fips == "24510", ]
-    total.emissions.motor.Baltimore <<-
-        aggregate(list(Emissions = NEI.motor.Baltimore$Emissions),
-                  by=list(year = NEI.motor.Baltimore$year), sum)
-}
+if (! exists("NEI.on.road"))
+    NEI.on.road <<- NEI[NEI$type == "ON-ROAD",]
 
-if (! exists("total.emissions.motor.Los.Angeles")) {
-    NEI.motor.Los.Angeles <- NEI.motor[NEI.motor$fips == "06037", ]
-    total.emissions.motor.Los.Angeles <<-
-        aggregate(list(Emissions = NEI.motor.Los.Angeles$Emissions),
-                  by=list(year = NEI.motor.Los.Angeles$year), sum)
-}
+if (! exists("NEI.non.road"))
+    NEI.non.road <<- NEI[NEI$type == "NON-ROAD",]
 
-                                        # add column city with "Baltimore"
-t.Baltimore <- total.emissions.motor.Baltimore
-t.Baltimore$City <- "Baltimore"
+if (! exists("NEI.on.road.Baltimore")) 
+    NEI.on.road.Baltimore <<- merge(NEI.on.road[NEI.on.road$fips == "24510", ],
+                                    SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
 
-                                        # add column city with "Los Angeles"
-t.Los.Angeles <- total.emissions.motor.Los.Angeles
-t.Los.Angeles$City <- "Los Angeles"
+if (! exists("NEI.non.road.Baltimore")) 
+    NEI.non.road.Baltimore <<-
+    merge(NEI.non.road[NEI.non.road$fips == "24510", ],
+          SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
 
-totals <- rbind(t.Baltimore, t.Los.Angeles)
-totals$City <- as.factor(totals$City)
+if (! exists("NEI.on.road.Los.Angeles")) 
+    NEI.on.road.Los.Angeles <<- merge(NEI.on.road[NEI.on.road$fips == "06037", ],
+                                    SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+
+if (! exists("NEI.non.road.Los.Angeles")) 
+    NEI.non.road.Los.Angeles <<-
+    merge(NEI.non.road[NEI.non.road$fips == "06037", ],
+          SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+
+t.on.road.Baltimore <- NEI.on.road.Baltimore 
+t.on.road.Baltimore$City <- "Baltimore" # with column "Baltimore"
+
+t.on.road.Los.Angeles <- NEI.on.road.Los.Angeles 
+t.on.road.Los.Angeles$City <- "Los Angeles" # add column "Los Angeles"
+
+totals.on.road <<- rbind(t.on.road.Los.Angeles, t.on.road.Baltimore)
+totals.on.road$City <- as.factor(totals.on.road$City)
+
+t.non.road.Baltimore <- NEI.non.road.Baltimore 
+t.non.road.Baltimore$City <- "Baltimore" # add column "Baltimore"
+
+t.non.road.Los.Angeles <- NEI.non.road.Los.Angeles 
+t.non.road.Los.Angeles$City <- "Los Angeles" # add column "Los Angeles"
+
+totals.non.road <<- rbind(t.non.road.Los.Angeles, t.non.road.Baltimore)
+totals.non.road$City <- as.factor(totals.non.road$City)
 
 plot6 <- function() {
 
-    g <- ggplot(totals, aes(year, Emissions, colour=City, shape=City)) +
-         geom_line() + geom_point() +
-         ylab("Total emission of PM25 (ON-ROAD) in Tons") +
-         geom_smooth(method = 'lm', linetype = 3, se = FALSE) +
-         labs(title="Comparison of PM25 due to vehicles among Baltimore and Los Angeles")
-    print(g)
+    # there is an outlier above 1500 tons in Los Angeles that
+    # distortions the smooth for on.road. So I remove it for best
+    # appreciation, since there is no loss of trends senses. 
+    data <- totals.on.road[totals.on.road$Emissions < 1500, ]
+    
+    #data <- totals.on.road[totals.on.road$Emissions < 20], ]
+    # You can reduce the range of Emissions ir order to see better the red
+    # points (BALTIMORE). Try by example with totals.on.road$Emissions < 20
+
+    g.on.road <- ggplot(data, aes(year, Emissions, color = City)) +
+          facet_grid(. ~ EI.Sector) + xlab("ON-ROAD sources (motor vehicles)") +
+          ylab("PM 2.5 (ON-ROAD) in Tons") +
+          geom_point(size = 4, alpha = .3) +
+          geom_smooth(method = lm)
+
+    g.non.road <- ggplot(totals.non.road, aes(year, Emissions, color = City)) +
+          facet_grid(. ~ EI.Sector) + xlab("NON-ROAD sources") +
+          ylab("PM 2.5 (NON-ROAD) in Tons") +
+          geom_point(size = 4, alpha = .3) +
+          geom_smooth(method = lm, se = FALSE)
+                      # smooth std trespass negative y axis, so se = F
+    
+    grid.arrange(g.on.road, g.non.road, nrow = 2,
+                 main =
+                 "Comparison of PM 2.5 from mobile sources between Baltimore and Los Angeles",
+                 sub = textGrob("Years"))
 }
 
 plot6()
-png(filename = "plot6.png")
+png(filename = "plot6.png", width = 1000)
 plot6()
 dev.off()

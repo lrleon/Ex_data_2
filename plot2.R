@@ -5,19 +5,22 @@ if (! exists("NEI")) {
 }
 
 if (! exists("total.emissions.Baltimore")) {
-                                        # compute total average of Emissions
+                                        # compute total of Emissions
     message("Computing total emissions in Baltimore for each year ...")
-    NEI.Baltimore <-- NEI[NEI$fips == "24510", ]
+    NEI.Baltimore <<- NEI[NEI$fips == "24510", ]
     total.emissions.Baltimore <<-
         aggregate(list(Emissions=NEI.Baltimore$Emissions),
                   by=list(year=NEI.Baltimore$year), sum)
 }
 
 plot2 <- function() {
-    
-    plot(total.emissions.Baltimore$year, total.emissions.Baltimore$Emissions,
-         main="Total emission of PM25 in Baltimore city",
-         xlab="Year", ylab="Amount of PM25 in tons")
+
+    the.col = colorRampPalette(c("darkred", "yellow3"))(4)
+    barplot(total.emissions.Baltimore$Emissions,
+            names.arg=total.emissions.Baltimore$year,
+            col = c(the.col[1], the.col[3], the.col[2], the.col[4]),
+            main="Total emission of PM 2.5 in Baltimore city",
+            xlab="Year", ylab="Amount of PM 2.5 in tons")
     lines(total.emissions.Baltimore$year, total.emissions.Baltimore$Emissions)
 }
 

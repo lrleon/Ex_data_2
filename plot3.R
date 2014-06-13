@@ -1,29 +1,28 @@
 
-library(ggplot2)
+require(ggplot2)
 
+                                        # verifiy if the data is already loaded
 if (! exists("NEI")) {
     message("Reading data. Please wait a few seconds ...")
     NEI <<- readRDS("summarySCC_PM25.rds")
 }
 
+                                # verify if Baltimore data is already computed
 if (! exists("NEI.Baltimore")) {
     message("Filtering the data for Baltimore city")
-    NEI.Baltimore <<- NEI[NEI$fips == "24510", ]
-}
-
-if (! exists("total.emissions.Baltimore.by.type")) {
-    total.emissions.Baltimore.by.type <<-
-        aggregate(list(Emissions = NEI.Baltimore$Emissions),
-                  list(type = NEI.Baltimore$type, year = NEI.Baltimore$year),
-                  sum)
-}
+    NEI.Baltimore <<- NEI[NEI$fips == "24510", ]}
 
 plot3 <- function() {
 
-    g <- ggplot(total.emissions.Baltimore.by.type, aes(year, Emissions))
-    g <- g + geom_line() + facet_grid(. ~ type) + xlab("years") +
-         ylab("Total emissions in tons") +
-         labs(title="Total emissions of PM25 in Baltimore classified by type")
+    # there is an very outlier in NONPOINT type that dominates the
+    # slopes. So, we suppress it in order to highlight the variations
+    # without lossing the trends senses
+    data <- NEI.Baltimore[NEI.Baltimore$Emissions < 1000, ]
+    g <- ggplot(data, aes(year, Emissions)) 
+    g <- g + geom_smooth(method = lm, size = 1, col = "black", alpha = .5) +
+         facet_grid(. ~ type) + geom_point(col="salmon", alpha=.5, size=4) +
+         xlab("years") + ylab("Emissions in tons") +
+         labs(title="Emissions of PM 2.5 trends in Baltimore classified by type")
 
     print(g)
 }

@@ -1,31 +1,49 @@
-
+require(ggplot2)
+require(gridExtra)
 
 if (! exists("NEI")) {
     message("Reading data. Please wait a few seconds ...")
     NEI <<- readRDS("summarySCC_PM25.rds")
 }
 
-if (! exists("NEI.motor"))
-    NEI.motor <<- NEI[NEI$type == "ON-ROAD",]
+if (! exists("SCC"))
+    SCC <<- readRDS("Source_Classification_Code.rds")
 
-if (! exists("total.emissions.motor.Baltimore")) {
-    NEI.motor.Baltimore <- NEI.motor[NEI.motor$fips == "24510", ]
-    total.emissions.motor.Baltimore <<-
-        aggregate(list(Emissions = NEI.motor.Baltimore$Emissions),
-                  by=list(year = NEI.motor.Baltimore$year), sum)
-}
+if (! exists("NEI.on.road"))
+    NEI.on.road <<- NEI[NEI$type == "ON-ROAD",]
+
+if (! exists("NEI.on.road.Baltimore")) 
+    NEI.on.road.Baltimore <<- merge(NEI.on.road[NEI.on.road$fips == "24510", ],
+                                    SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+
+if (! exists("NEI.non.road"))
+    NEI.non.road <<- NEI[NEI$type == "NON-ROAD",]
+
+if (! exists("NEI.non.road.Baltimore")) 
+    NEI.non.road.Baltimore <<-
+    merge(NEI.non.road[NEI.non.road$fips == "24510", ],
+          SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
 
 plot5 <- function() {
 
-    plot(total.emissions.motor.Baltimore$year,
-         total.emissions.motor.Baltimore$Emissions,
-         main = "Total of PM25 related to motor in Baltimore",
-         xlab = "Year", ylab = "PM25 in tons")
-    lines(total.emissions.motor.Baltimore$year,
-          total.emissions.motor.Baltimore$Emissions)
+    g1 <- ggplot(NEI.on.road.Baltimore, aes(year, Emissions)) +
+          geom_point(col= "salmon", size = 3, alpha = .4) +
+          facet_grid(. ~ EI.Sector) + scale_colour_discrete(guide = FALSE) +
+          geom_smooth(method = loess, alpha = .5, color = "red") +
+          xlab("ON-ROAD sources (vehicles)") + ylab("PM 2.5 in tons")
+    
+    g2 <- ggplot(NEI.non.road.Baltimore, aes(year, Emissions)) +
+          geom_point(col = "salmon", size = 3, alpha = .4) +
+          facet_grid(. ~ EI.Sector) + scale_colour_discrete(guide = FALSE) +
+          geom_smooth(method = loess, alpha = .5, color = "red", se = FALSE) +
+          xlab("NON-ROAD sources") + ylab("PM 2.5 in tons") 
+
+    grid.arrange(g1, g2, nrow = 2,
+                 main = "Emission of PM 2.5 from distint \"mobile\" sources (including \"motor vehicles\") for Baltimore)",
+                 sub = textGrob("Years"))
 }
 
 plot5()
-png(filename = "plot5.png")
+png(filename = "plot5.png", width = 800)
 plot5()
 dev.off()
