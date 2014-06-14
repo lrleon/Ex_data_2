@@ -17,12 +17,12 @@ if (! exists("NEI.non.road"))    # NEI subset containg NON-ROAD types
 
 if (! exists("NEI.on.road.Baltimore")) 
     NEI.on.road.Baltimore <<- merge(NEI.on.road[NEI.on.road$fips == "24510", ],
-                                    SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+                                    SCC[, c(1, 4)], by = "SCC")
 
 if (! exists("NEI.non.road.Baltimore")) 
     NEI.non.road.Baltimore <<-
     merge(NEI.non.road[NEI.non.road$fips == "24510", ],
-          SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+          SCC[, c(1, 4)], by = "SCC")
 
 plot5 <- function() {
 

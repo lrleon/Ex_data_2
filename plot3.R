@@ -1,6 +1,5 @@
 
 require(ggplot2)
-
                                         
 if (! exists("NEI")) {    # verifiy if NEI data is already loaded
     message("Reading data. Please wait a few seconds ...")

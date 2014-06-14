@@ -17,22 +17,22 @@ if (! exists("NEI.non.road"))    # NEI subset containg NON-ROAD types
 
 if (! exists("NEI.on.road.Baltimore")) 
     NEI.on.road.Baltimore <<- merge(NEI.on.road[NEI.on.road$fips == "24510", ],
-                                    SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+                                    SCC[, c(1, 4)], by = "SCC")
 
 if (! exists("NEI.non.road.Baltimore")) 
     NEI.non.road.Baltimore <<-
     merge(NEI.non.road[NEI.non.road$fips == "24510", ],
-          SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+          SCC[, c(1, 4)], by = "SCC")
 
 if (! exists("NEI.on.road.Los.Angeles")) 
     NEI.on.road.Los.Angeles <<-
     merge(NEI.on.road[NEI.on.road$fips == "06037", ],
-          SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+          SCC[, c(1, 4)], by = "SCC")
 
 if (! exists("NEI.non.road.Los.Angeles")) 
     NEI.non.road.Los.Angeles <<-
     merge(NEI.non.road[NEI.non.road$fips == "06037", ],
-          SCC[, c(1, 4)], by.x = "SCC", by.y = "SCC")
+          SCC[, c(1, 4)], by = "SCC")
 
 t.on.road.Baltimore <- NEI.on.road.Baltimore 
 t.on.road.Baltimore$City <- "Baltimore" # with column "Baltimore"

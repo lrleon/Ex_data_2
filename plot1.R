@@ -12,7 +12,7 @@
 # 2- a plotx() function that builds the plot
 #
 # 3- Plotting in the screen and after sending it to png device. In this
-#    way, the plor can be displayed in the screen at same time that this is
+#    way, the plot can be displayed in the screen at same time that this is
 #    written in the png file. The idea of ths approach is that you can
 #    corroborate the plot in your screen. Comment the first call to
 #    plotx() if you not wish the plot in the screen

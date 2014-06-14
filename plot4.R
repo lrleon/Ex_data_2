@@ -10,6 +10,7 @@ if (! exists("SCC"))    # verify if SCC data is already loaded
 
 if (! exists("NEI.coal")) { # verify if coal related is already computed
 
+    message("Computing data related to coal. Please wait ...")
                                         # determine SSC codes related to coal
     coal.str <- "[cC][oO][aA][lL]"      # the word "coal"
     coal.idx <- grep(coal.str, SCC$EI.Sector)
@@ -22,7 +23,7 @@ if (! exists("NEI.coal")) { # verify if coal related is already computed
 
                                         # merge for concatening a col
                                         # with EI.Sector
-    NEI.coal <<- merge(NEI.coal, SCC.sources, by.x = "SCC", by.y = "SCC")
+    NEI.coal <<- merge(NEI.coal, SCC.sources, by = "SCC")
 }
 
 plot4 <- function() {
