@@ -30,7 +30,7 @@ plot4 <- function() {
 
     data <- NEI.coal
     g <- ggplot(data, aes(year, Emissions)) + facet_grid(. ~ EI.Sector) +
-         geom_point(alpha = .1, size = 2) +
+         geom_point(copl = "salmon", alpha = .1, size = 2) +
          geom_smooth(method = lm, alpha = .3, col = "darkgray") +
          labs(title = "Emissions of PM 2.5 related to coal in US",
               xlab = "Year", ylab = "PM25 in tons")
